@@ -3,10 +3,15 @@ package com;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.jetty.SlackAppServer;
 import edu.ksu.canvas.TestLauncher;
+import edu.ksu.canvas.oauth.NonRefreshableOauthToken;
 import edu.ksu.canvas.oauth.OauthToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 
 
@@ -24,20 +29,22 @@ public class Main {
 
 
         String canvasUrl = "https://touro.instructure.com/";
-        String oauthToken = "10898~w5xtL2u6BExK3Ab4KWbLKl8USzH5Mdw2lCldqbuStBZhWiRJvwOgcOz4olf9u6rY\n";
+        String oauthToken = "";
+        OauthToken sOautToken = new NonRefreshableOauthToken(oauthToken);
         TestLauncher launcher = new TestLauncher(canvasUrl, oauthToken);
         // name your command here.
         app.command("/helloworld", (req, ctx) -> {
-            try {
-                launcher.getOwnCourses();
-            } catch(Exception e) {
-                System.out.println("Error");
-            }
-            try {
-                launcher.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            // read this input
+            new Thread(() -> {
+                try {
+                    launcher.getOwnCourses();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+
+            System.out.println("THREAD+++++++ " + Thread.activeCount());
             //TimeUnit.SECONDS.sleep(1);
             ctx.respond("dsjlf");
             return ctx.ack();

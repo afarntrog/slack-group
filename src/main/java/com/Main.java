@@ -55,7 +55,6 @@ public class Main {
     }
 
     public static void saveUserInformation(String userId, String canvasAccessToken) {
-        // establish connection to database
         Connection conn = establishConnection();
         PreparedStatement stmt = null;
 
@@ -73,9 +72,29 @@ public class Main {
         }
     }
 
+    public static String getCanvasTokenFromUserId(String userId) {
+        Connection conn = establishConnection();
+        
+        String sql = "SELECT * FROM USERS WHERE userid = ?";
+
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            rs.next();
+            return rs.getString(2); // canvas authentication token
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
     public static void main(String[] args) throws Exception {
         App app = new App();
 
+        
         app.command("/helloworld", (req, ctx) -> {
             CanvasGetter launcher = new CanvasGetter();
             // read this input
@@ -119,11 +138,12 @@ public class Main {
             // We need to acknowledge the user's command within 3000 ms, (3 seconds),
             // so we'll do these operations completely independent from the ctx.ack (acknowledgement)
             new Thread(() -> {
-                saveUserInformation(userId, canvasAccessToken);
+                saveUserInformation(userId, canvasAccessToken);                
             }).start();
 
             return ctx.ack("We've received your token. You should be able to make requests now.");
             });
+
 
         int port = Integer.parseInt(environment.get("PORT"));
         SlackAppServer server = new SlackAppServer(app, port);

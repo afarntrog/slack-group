@@ -26,13 +26,12 @@ public class CanvasGetter {
     String StringOauthToken = "";
     private OauthToken oauthToken = new NonRefreshableOauthToken(StringOauthToken);
 
-
-
-
+    
     public void getRootAccount() throws IOException {
         CanvasApiFactory apiFactory = new CanvasApiFactory(canvasUrl);
         AccountReader acctReader = apiFactory.getReader(AccountReader.class, oauthToken);
         Account rootAccount = acctReader.getSingleAccount("1").get();
+
         LOG.info("Got account from Canvas: " + rootAccount.getName());
     }
 
@@ -56,5 +55,8 @@ public class CanvasGetter {
         return stringBuilder.toString();
     }
 
-
+    private void setOAuthToken(String oAuthToken) {
+        this.StringOauthToken = oAuthToken;
+    }
 }
+

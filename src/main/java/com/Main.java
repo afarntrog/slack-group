@@ -18,13 +18,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.Map;
 import java.net.URI;
 import java.sql.*;
 
-
 public class Main {
-    
+
     public static Map<String, String> environment = System.getenv();
 
     public static void saveUserInformation(String userId, String canvasAccessToken) {
@@ -32,7 +36,7 @@ public class Main {
         String databaseURL  = environment.get("JDBC_DATABASE_URL");
         String databaseUsername = environment.get("JDBC_DATABASE_USERNAME");
         String databasePassword = environment.get("JDBC_DATABASE_PASSWORD");
-        
+
         // establish connection to database
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -49,7 +53,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        // save user information 
+        // save user information
         try {
             String query = "INSERT INTO Users VALUES(?,?);";
             stmt = conn.prepareStatement(query);
@@ -65,7 +69,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         App app = new App();
-        
+
         app.command("/helloworld", (req, ctx) -> {
             CanvasGetter launcher = new CanvasGetter();
             // read this input
@@ -84,11 +88,37 @@ public class Main {
             return ctx.ack();
         });
 
+
+
+
+        // name your command here.
+        app.command("/up-as", (req, ctx) -> {
+            CanvasGetter launcher = new CanvasGetter();
+            // launch thread to get upcoming assignments.
+            new Thread(() -> {
+                try {
+                    ctx.respond(launcher.getUpcomingAssignments());
+                    System.out.println("DONE");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            System.out.println("THREAD+++++++ " + Thread.activeCount());
+            return ctx.ack();
+        });
+
+
+
+
+
+
+
         app.command("/authenticate-canvas", (req, ctx) -> {
             String userId = req.getPayload().getUserId();
             String canvasAccessToken = req.getPayload().getText();
-            
-            // We need to acknowledge the user's command within 3000 ms, (3 seconds), 
+
+            // We need to acknowledge the user's command within 3000 ms, (3 seconds),
             // so we'll do these operations completely independent from the ctx.ack (acknowledgement)
             new Thread(() -> {
                 saveUserInformation(userId, canvasAccessToken);
@@ -96,15 +126,12 @@ public class Main {
 
             return ctx.ack("We've received your token. You should be able to make requests now.");
             });
-            
+
         int port = Integer.parseInt(environment.get("PORT"));
         SlackAppServer server = new SlackAppServer(app, port);
-        server.start(); 
-}
+        server.start();
+    }
 
-
-
-
-
-
+    //SlackAppServer server = new SlackAppServer(app);
+    //server.start(); // http://localhost:3000/slack/events
 }

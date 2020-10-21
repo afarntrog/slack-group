@@ -18,24 +18,55 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.net.URI;
+import java.sql.*;
 
 
 public class Main {
+    
+    public static Map<String, String> environment = System.getenv();
+
+    public static void saveUserInformation(String userId, String canvasAccessToken) {
+        // get authentication information for database
+        String databaseURL  = environment.get("JDBC_DATABASE_URL");
+        String databaseUsername = environment.get("JDBC_DATABASE_USERNAME");
+        String databasePassword = environment.get("JDBC_DATABASE_PASSWORD");
+        
+        // establish connection to database
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch(ClassNotFoundException e) {
+            System.exit(1);
+        }
+
+        try {
+            conn = DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        // save user information 
+        try {
+            String query = "INSERT INTO Users VALUES(?,?);";
+            stmt = conn.prepareStatement(query);
+
+            stmt.setString(1, userId);
+            stmt.setString(2, canvasAccessToken);
+
+            stmt.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) throws Exception {
-        // App expects env variables (SLACK_BOT_TOKEN, SLACK_SIGNING_SECRET)
         App app = new App();
-
-
-
-        // name your command here.
+        
         app.command("/helloworld", (req, ctx) -> {
-            //String allCoursesDescription
             CanvasGetter launcher = new CanvasGetter();
             // read this input
             new Thread(() -> {
@@ -53,9 +84,23 @@ public class Main {
             return ctx.ack();
         });
 
-        SlackAppServer server = new SlackAppServer(app);
-        server.start(); // http://localhost:3000/slack/events
-    }
+        app.command("/authenticate-canvas", (req, ctx) -> {
+            String userId = req.getPayload().getUserId();
+            String canvasAccessToken = req.getPayload().getText();
+            
+            // We need to acknowledge the user's command within 3000 ms, (3 seconds), 
+            // so we'll do these operations completely independent from the ctx.ack (acknowledgement)
+            new Thread(() -> {
+                saveUserInformation(userId, canvasAccessToken);
+            }).start();
+
+            return ctx.ack("We've received your token. You should be able to make requests now.");
+            });
+            
+        int port = Integer.parseInt(environment.get("PORT"));
+        SlackAppServer server = new SlackAppServer(app, port);
+        server.start(); 
+}
 
 
 

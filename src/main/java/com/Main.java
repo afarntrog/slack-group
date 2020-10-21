@@ -115,12 +115,13 @@ public class Main {
 
         // name your command here.
         app.command("/up-as", (req, ctx) -> {
-            CanvasGetter launcher = new CanvasGetter();
             // launch thread to get upcoming assignments.
             new Thread(() -> {
                 try {
+                    String canvasAuthToken = getCanvasTokenFromUserId(req.getPayload().getUserId());
+
+                    CanvasGetter launcher = new CanvasGetter(canvasAuthToken);
                     ctx.respond(launcher.getUpcomingAssignments());
-                    System.out.println("DONE");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

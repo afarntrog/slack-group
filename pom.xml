@@ -50,7 +50,6 @@
             <systemPath>${project.basedir}/src/main/resources/SlackCan-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
         </dependency>
 
-
         <dependency>
             <groupId> org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>

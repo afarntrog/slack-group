@@ -1,1 +1,8 @@
 .env
+target/
+.idea/
+.settings/
+.project
+.vscode/
+system.properties
+.classpath

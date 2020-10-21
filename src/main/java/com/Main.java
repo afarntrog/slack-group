@@ -14,6 +14,8 @@ import edu.ksu.canvas.oauth.NonRefreshableOauthToken;
 import edu.ksu.canvas.oauth.OauthToken;
 import edu.ksu.canvas.requestOptions.ListCourseAssignmentsOptions;
 import edu.ksu.canvas.requestOptions.ListCurrentUserCoursesOptions;
+import sun.tools.java.ClassNotFound;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,28 +32,32 @@ import java.sql.*;
 public class Main {
 
     public static Map<String, String> environment = System.getenv();
+    static String databaseURL  = environment.get("JDBC_DATABASE_URL");
+    static String databaseUsername = environment.get("JDBC_DATABASE_USERNAME");
+    static String databasePassword = environment.get("JDBC_DATABASE_PASSWORD");
+
+
+    public static Connection establishConnection() {
+        try {
+            Class.forName("org.postgresql.Driver");    
+        } catch(ClassNotFoundException e) {
+            System.out.println("Something has gone wrong with the database driver");
+            System.exit(1);    
+        }
+
+        try {
+            return DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
+        } catch(SQLException e) {
+           e.printStackTrace();
+        }
+
+        return null;
+    }
 
     public static void saveUserInformation(String userId, String canvasAccessToken) {
-        // get authentication information for database
-        String databaseURL  = environment.get("JDBC_DATABASE_URL");
-        String databaseUsername = environment.get("JDBC_DATABASE_USERNAME");
-        String databasePassword = environment.get("JDBC_DATABASE_PASSWORD");
-
         // establish connection to database
-        Connection conn = null;
+        Connection conn = establishConnection();
         PreparedStatement stmt = null;
-
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch(ClassNotFoundException e) {
-            System.exit(1);
-        }
-
-        try {
-            conn = DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
 
         // save user information
         try {
@@ -88,9 +94,6 @@ public class Main {
             return ctx.ack();
         });
 
-
-
-
         // name your command here.
         app.command("/up-as", (req, ctx) -> {
             CanvasGetter launcher = new CanvasGetter();
@@ -107,11 +110,6 @@ public class Main {
             System.out.println("THREAD+++++++ " + Thread.activeCount());
             return ctx.ack();
         });
-
-
-
-
-
 
 
         app.command("/authenticate-canvas", (req, ctx) -> {
@@ -131,7 +129,4 @@ public class Main {
         SlackAppServer server = new SlackAppServer(app, port);
         server.start();
     }
-
-    //SlackAppServer server = new SlackAppServer(app);
-    //server.start(); // http://localhost:3000/slack/events
 }

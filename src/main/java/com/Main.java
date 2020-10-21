@@ -53,6 +53,27 @@ public class Main {
             return ctx.ack();
         });
 
+        // name your command here.
+        app.command("/up-as", (req, ctx) -> {
+            //String allCoursesDescription
+            CanvasGetter launcher = new CanvasGetter();
+            // read this input
+            new Thread(() -> {
+                try {
+                    ctx.respond(launcher.getUpcomingAssignments());
+                    System.out.println("DONE");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+
+            System.out.println("THREAD+++++++ " + Thread.activeCount());
+            //TimeUnit.SECONDS.sleep(1);
+            //ctx.respond();
+            return ctx.ack();
+        });
+
         SlackAppServer server = new SlackAppServer(app);
         server.start(); // http://localhost:3000/slack/events
     }

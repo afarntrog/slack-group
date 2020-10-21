@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "env": {
+                "PORT" : 4500,
+                "SLACK_BOT_TOKEN" : "xoxb-1430949042193-1437725040965-RfhXStBL01fVt210la5Kn4ot",
+                "SLACK_SIGNING_SECRET" : "6d2600071443a624e4eb259bb985d2d5"
+            }
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Main<testerslack>",
+            "request": "launch",
+            "mainClass": "com.Main",
+            "projectName": "testerslack"
+        }
+    ]
+}

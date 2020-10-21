@@ -5,6 +5,7 @@ import edu.ksu.canvas.TestLauncher;
 import edu.ksu.canvas.interfaces.AccountReader;
 import edu.ksu.canvas.interfaces.AssignmentReader;
 import edu.ksu.canvas.interfaces.CourseReader;
+import edu.ksu.canvas.interfaces.QuizReader;
 import edu.ksu.canvas.model.Account;
 import edu.ksu.canvas.model.Course;
 import edu.ksu.canvas.model.assignment.Assignment;
@@ -37,6 +38,11 @@ public class CanvasGetter {
         this.oauthToken = new NonRefreshableOauthToken(CANVAS_AUTH_TOKEN);
     }
 
+    
+    public CanvasGetter(String canvasAuthToken) {
+        this.CANVAS_AUTH_TOKEN = canvasAuthToken;
+        this.oauthToken = new NonRefreshableOauthToken(CANVAS_AUTH_TOKEN);
+    }
 
     // This is not working.
     public void getRootAccount() throws IOException {
@@ -95,6 +101,5 @@ public class CanvasGetter {
         }
         return stringBuilder.toString();
     }
-
 }
 

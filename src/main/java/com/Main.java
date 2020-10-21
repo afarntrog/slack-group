@@ -14,6 +14,8 @@ import edu.ksu.canvas.oauth.NonRefreshableOauthToken;
 import edu.ksu.canvas.oauth.OauthToken;
 import edu.ksu.canvas.requestOptions.ListCourseAssignmentsOptions;
 import edu.ksu.canvas.requestOptions.ListCurrentUserCoursesOptions;
+import sun.tools.java.ClassNotFound;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,28 +32,31 @@ import java.sql.*;
 public class Main {
 
     public static Map<String, String> environment = System.getenv();
+    static String databaseURL  = environment.get("JDBC_DATABASE_URL");
+    static String databaseUsername = environment.get("JDBC_DATABASE_USERNAME");
+    static String databasePassword = environment.get("JDBC_DATABASE_PASSWORD");
+
+
+    public static Connection establishConnection() {
+        try {
+            Class.forName("org.postgresql.Driver");    
+        } catch(ClassNotFoundException e) {
+            System.out.println("Something has gone wrong with the database driver");
+            System.exit(1);    
+        }
+
+        try {
+            return DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
+        } catch(SQLException e) {
+           e.printStackTrace();
+        }
+
+        return null;
+    }
 
     public static void saveUserInformation(String userId, String canvasAccessToken) {
-        // get authentication information for database
-        String databaseURL  = environment.get("JDBC_DATABASE_URL");
-        String databaseUsername = environment.get("JDBC_DATABASE_USERNAME");
-        String databasePassword = environment.get("JDBC_DATABASE_PASSWORD");
-
-        // establish connection to database
-        Connection conn = null;
+        Connection conn = establishConnection();
         PreparedStatement stmt = null;
-
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch(ClassNotFoundException e) {
-            System.exit(1);
-        }
-
-        try {
-            conn = DriverManager.getConnection(databaseURL, databaseUsername, databasePassword);
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
 
         // save user information
         try {
@@ -67,9 +72,29 @@ public class Main {
         }
     }
 
+    public static String getCanvasTokenFromUserId(String userId) {
+        Connection conn = establishConnection();
+        
+        String sql = "SELECT * FROM USERS WHERE userid = ?";
+
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            rs.next();
+            return rs.getString(2); // canvas authentication token
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
     public static void main(String[] args) throws Exception {
         App app = new App();
 
+        
         app.command("/helloworld", (req, ctx) -> {
             CanvasGetter launcher = new CanvasGetter();
             // read this input
@@ -88,17 +113,15 @@ public class Main {
             return ctx.ack();
         });
 
-
-
-
         // name your command here.
         app.command("/up-as", (req, ctx) -> {
-            CanvasGetter launcher = new CanvasGetter();
             // launch thread to get upcoming assignments.
             new Thread(() -> {
                 try {
+                    String canvasAuthToken = getCanvasTokenFromUserId(req.getPayload().getUserId());
+
+                    CanvasGetter launcher = new CanvasGetter(canvasAuthToken);
                     ctx.respond(launcher.getUpcomingAssignments());
-                    System.out.println("DONE");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -109,11 +132,6 @@ public class Main {
         });
 
 
-
-
-
-
-
         app.command("/authenticate-canvas", (req, ctx) -> {
             String userId = req.getPayload().getUserId();
             String canvasAccessToken = req.getPayload().getText();
@@ -121,17 +139,15 @@ public class Main {
             // We need to acknowledge the user's command within 3000 ms, (3 seconds),
             // so we'll do these operations completely independent from the ctx.ack (acknowledgement)
             new Thread(() -> {
-                saveUserInformation(userId, canvasAccessToken);
+                saveUserInformation(userId, canvasAccessToken);                
             }).start();
 
             return ctx.ack("We've received your token. You should be able to make requests now.");
             });
 
+
         int port = Integer.parseInt(environment.get("PORT"));
         SlackAppServer server = new SlackAppServer(app, port);
         server.start();
     }
-
-    //SlackAppServer server = new SlackAppServer(app);
-    //server.start(); // http://localhost:3000/slack/events
 }

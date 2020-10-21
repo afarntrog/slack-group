@@ -10,6 +10,7 @@ import edu.ksu.canvas.model.Course;
 import edu.ksu.canvas.model.assignment.Assignment;
 import edu.ksu.canvas.oauth.NonRefreshableOauthToken;
 import edu.ksu.canvas.oauth.OauthToken;
+import edu.ksu.canvas.requestOptions.GetSingleAssignmentOptions;
 import edu.ksu.canvas.requestOptions.ListCourseAssignmentsOptions;
 import edu.ksu.canvas.requestOptions.ListCurrentUserCoursesOptions;
 import edu.ksu.canvas.requestOptions.ListUserAssignmentOptions;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class CanvasGetter {
 
@@ -74,13 +76,11 @@ public class CanvasGetter {
         LOG.info("Got " + myCourses.size() + " courses back from Canvas: ");
         for(Course course : myCourses) {
             ListCourseAssignmentsOptions listCourseAssignmentsOptions = new ListCourseAssignmentsOptions(String.valueOf(course.getId()));
-            //listCourseAssignmentsOptions = listCourseAssignmentsOptions.bucketFilter(ListCourseAssignmentsOptions.Bucket.UNGRADED);
             for (Assignment v : ar.listCourseAssignments(listCourseAssignmentsOptions)) {
-                if (v.getDueAt() != null) {
-                    Date date = v.getDueAt();
+                Date date = v.getDueAt();
+                if (date != null) {
                     Date today = new Date();
-                    if (today.before(date)) {
-                        String l = "Not due";
+                    if (today.before(date)) {   // not yet due.
                         upcomingAssignments.add(v.getName() + "\n" + v.getDueAt() + "\n\n");
                     }
                 }

@@ -55,9 +55,8 @@ public class Main {
 
         // name your command here.
         app.command("/up-as", (req, ctx) -> {
-            //String allCoursesDescription
             CanvasGetter launcher = new CanvasGetter();
-            // read this input
+            // launch thread to get upcoming assignments.
             new Thread(() -> {
                 try {
                     ctx.respond(launcher.getUpcomingAssignments());
@@ -67,10 +66,7 @@ public class Main {
                 }
             }).start();
 
-
             System.out.println("THREAD+++++++ " + Thread.activeCount());
-            //TimeUnit.SECONDS.sleep(1);
-            //ctx.respond();
             return ctx.ack();
         });
 

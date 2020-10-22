@@ -14,7 +14,7 @@ import edu.ksu.canvas.oauth.NonRefreshableOauthToken;
 import edu.ksu.canvas.oauth.OauthToken;
 import edu.ksu.canvas.requestOptions.ListCourseAssignmentsOptions;
 import edu.ksu.canvas.requestOptions.ListCurrentUserCoursesOptions;
-import sun.tools.java.ClassNotFound;
+import java.lang.ClassNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

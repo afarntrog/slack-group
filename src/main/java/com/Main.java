@@ -2,6 +2,12 @@ package com;
 
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.jetty.SlackAppServer;
+import com.slack.api.model.block.composition.TextObject;
+
+import static com.slack.api.model.block.Blocks.*;
+import static com.slack.api.model.block.composition.BlockCompositions.*;
+import static com.slack.api.model.block.element.BlockElements.*;
+
 import edu.ksu.canvas.CanvasApiFactory;
 import edu.ksu.canvas.TestLauncher;
 import edu.ksu.canvas.interfaces.AccountReader;
@@ -91,44 +97,32 @@ public class Main {
         return "";
     }
 
+    public static CanvasGetter setupCanvasGetter(String userId) {
+        String canvasAuthToken = getCanvasTokenFromUserId(userId);
+        return new CanvasGetter(canvasAuthToken);
+    }
+
     public static void main(String[] args) throws Exception {
         App app = new App();
 
-        
+        // display usage information and instructions here
         app.command("/helloworld", (req, ctx) -> {
-            CanvasGetter launcher = new CanvasGetter();
-            // read this input
-            new Thread(() -> {
-                try {
-                   ctx.respond(launcher.getOwnCourses());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+            return ctx.ack(asBlocks(
+                section(s -> s.text(markdownText(":wave: from SlackCan!"))),
+                section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack."))),
+                
+                divider(),
+                
+                section(s -> s.text(markdownText(":memo: To setup your account, first follow our basic tutorial on getting an access token from Canvas's dashboard. Once you have it, come back here."))),
+                section(s -> s.text(markdownText(":one: Ok, now you can run /canvas-authenticate <token> (put your canvas token after the slash command)"))),
+                section(s -> s.text(markdownText(":two: That's all it takes! You're officially connected to Canvas now. Below are a few commands you can get started with."))),
 
+                divider(),
 
-            System.out.println("THREAD+++++++ " + Thread.activeCount());
-            //TimeUnit.SECONDS.sleep(1);
-            //ctx.respond();
-            return ctx.ack();
-        });
-
-        // name your command here.
-        app.command("/up-as", (req, ctx) -> {
-            // launch thread to get upcoming assignments.
-            new Thread(() -> {
-                try {
-                    String canvasAuthToken = getCanvasTokenFromUserId(req.getPayload().getUserId());
-
-                    CanvasGetter launcher = new CanvasGetter(canvasAuthToken);
-                    ctx.respond(launcher.getUpcomingAssignments());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
-            System.out.println("THREAD+++++++ " + Thread.activeCount());
-            return ctx.ack();
+                section(s -> s.text(markdownText("/*helloworld* - To get this message again"))),
+                section(s -> s.text(markdownText("/*canvas-authenticate* - To connect to Canvas (you only have to do it once!)"))),
+                section(s -> s.text(markdownText("/*upcoming-assignments* - get all upcoming assignments")))
+            ));
         });
 
 
@@ -138,12 +132,26 @@ public class Main {
 
             // We need to acknowledge the user's command within 3000 ms, (3 seconds),
             // so we'll do these operations completely independent from the ctx.ack (acknowledgement)
-            new Thread(() -> {
-                saveUserInformation(userId, canvasAccessToken);                
-            }).start();
+            new Thread(() -> saveUserInformation(userId, canvasAccessToken)).start();
 
             return ctx.ack("We've received your token. You should be able to make requests now.");
             });
+            
+
+        app.command("/upcoming-assignments", (req, ctx) -> {
+            // launch thread to get upcoming assignments.
+            new Thread(() -> {
+                try {
+                    CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
+                    ctx.respond(canvasGetter.getUpcomingAssignments());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            System.out.println("THREAD+++++++ " + Thread.activeCount());
+            return ctx.ack("We're getting the info now...");
+        });
 
 
         int port = Integer.parseInt(environment.get("PORT"));

@@ -105,6 +105,11 @@ public class Main {
     public static void main(String[] args) throws Exception {
         App app = new App();
 
+        // To prevent heroku from sleeping 
+        app.endpoint("GET", "/ping", (req, ctx) -> {
+            return ctx.ackWithJson("{status: ok}");
+        });
+
         // display usage information and instructions here
         app.command("/helloworld", (req, ctx) -> {
             return ctx.ack(asBlocks(

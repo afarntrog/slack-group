@@ -143,7 +143,14 @@ public class Main {
             new Thread(() -> {
                 try {
                     CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
-                    ctx.respond(canvasGetter.getUpcomingAssignments());
+                    String upcomingAssignments = canvasGetter.getUpcomingAssignments();
+                    ctx.respond(asBlocks(
+                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:*"))),
+
+                            divider(),
+
+                            section(s -> s.text(markdownText(upcomingAssignments)))
+                    ));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

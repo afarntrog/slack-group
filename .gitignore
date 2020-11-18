@@ -1,4 +1,5 @@
-.settings 
+.idea
+.settings
 .vscode
 .env
 target/
@@ -75,3 +76,4 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 
+/.idea/

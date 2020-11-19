@@ -23,10 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class CanvasGetter {
 
@@ -131,6 +128,7 @@ public class CanvasGetter {
 
     private String formatAssignment(Assignment as, int i) {
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, hh:mm a z");
+        formatter.setTimeZone(TimeZone.getTimeZone("EST"));
         String formattedAssignment =
                 "\t\t:memo:  *" + i + ")* " + as.getName()
                 + "\n\n\t\t:stopwatch:  *Due date:* "

@@ -128,7 +128,7 @@ public class CanvasGetter {
 
     private String formatAssignment(Assignment as, int i) {
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, hh:mm a z");
-        formatter.setTimeZone(TimeZone.getTimeZone("EST"));
+        formatter.setTimeZone(TimeZone.getDefault());
         String formattedAssignment =
                 "\t\t:memo:  *" + i + ")* " + as.getName()
                 + "\n\n\t\t:stopwatch:  *Due date:* "

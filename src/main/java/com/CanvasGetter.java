@@ -111,9 +111,11 @@ public class CanvasGetter {
                     Date today = new Date();
                     if (today.before(date)) {   // not yet due.
                         if (i == 1) {           // if first in course, append course name
+                            LOG.info("appending course name: " + course.getName());
                             stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *"
                                     + course.getName() + ":* \n \n");
                         }
+                        LOG.info("formatting assignment: " + as.getName());
                         stringBuilder.append(formatAssignment(as, i++));
                     }
                 }

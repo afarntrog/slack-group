@@ -62,15 +62,17 @@ public class Main {
 
     public static void saveUserInformation(String userId, String canvasAccessToken) {
         Connection conn = establishConnection();
-        PreparedStatement stmt = null;
 
-        // save user information
+        // query inserts new users into DB and updates existing users' tokens
+        String query = "INSERT INTO users " +
+                        "VALUES(?,?) ON CONFLICT (userid) DO " +
+                        "UPDATE SET canvasaccesstoken = ?";
+
         try {
-            String query = "INSERT INTO Users VALUES(?,?);";
-            stmt = conn.prepareStatement(query);
-
+            PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, userId);
             stmt.setString(2, canvasAccessToken);
+            stmt.setString(3, canvasAccessToken);
 
             stmt.executeUpdate();
         } catch(SQLException e) {
@@ -148,7 +150,14 @@ public class Main {
             new Thread(() -> {
                 try {
                     CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
-                    ctx.respond(canvasGetter.getUpcomingAssignments());
+                    String upcomingAssignments = canvasGetter.getUpcomingAssignments();
+                    ctx.respond(asBlocks(
+                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:*"))),
+
+                            divider(),
+
+                            section(s -> s.text(markdownText(upcomingAssignments)))
+                    ));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

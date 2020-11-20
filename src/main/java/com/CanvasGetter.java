@@ -29,11 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class CanvasGetter {
 
@@ -109,8 +106,8 @@ public class CanvasGetter {
     }
 
     public String getUpcomingAssignments() throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
         ArrayList<String> upcomingAssignments = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
 
         List<Course> myCourses = getCourses();
         List<Assignment> assignments;
@@ -121,21 +118,50 @@ public class CanvasGetter {
             LOG.info("  " + course.getName());
 
             assignments = getAssignments(course);
-            for (Assignment v : assignments) {
-                Date date = v.getDueAt();
+            int i = 1;
+            for (Assignment as : assignments) {
+                Date date = as.getDueAt();
                 if (date != null) {
                     Date today = new Date();
                     if (today.before(date)) {   // not yet due.
-                        upcomingAssignments.add(v.getName() + "\n" + v.getDueAt() + "\n\n");
+                        if (i == 1) {           // if first in course, append course name
+                            LOG.info("appending course name: " + course.getName());
+                            stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *"
+                                    + course.getName() + ":* \n \n");
+                        }
+                        LOG.info("formatting assignment: " + as.getName());
+                        stringBuilder.append(formatAssignment(as, i++));
                     }
                 }
             }
         }
 
-        // Add all the assignments to the string builder.
-        for (int i = 0; i < upcomingAssignments.size(); i++) {
-            stringBuilder.append(i + 1).append(")").append(upcomingAssignments.get(i));
+        if (stringBuilder.length() == 0) {      // if no assignments due
+            stringBuilder.append(getNoAssignmentsDueString());
         }
+
         return stringBuilder.toString();
+    }
+
+    private String formatAssignment(Assignment as, int i) {
+        SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, hh:mm a z");
+        //formatter.setTimeZone(TimeZone.getDefault());
+        String formattedAssignment =
+                "\t\t:memo:  *" + i + ")* " + as.getName()
+                + "\n\n\t\t:stopwatch:  *Due date:* "
+                + formatter.format(as.getDueAt())
+                + "\n\n";
+        return formattedAssignment;
+    }
+
+
+    private String getNoAssignmentsDueString() {
+        return ":tada::balloon::confetti_ball:".repeat(4)
+                + "\n:confetti_ball:" + " ".repeat(58)
+                + ":tada:\n:balloon:" + " ".repeat(10)
+                + "You're all caught up! :smiley:"
+                + " ".repeat(7) + ":balloon:\n"
+                + ":confetti_ball:" + " ".repeat(58)
+                + ":tada:\n" + ":tada::balloon::confetti_ball:".repeat(4);
     }
 }

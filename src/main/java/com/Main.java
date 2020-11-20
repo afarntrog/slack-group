@@ -62,6 +62,7 @@ public class Main {
     }
 
     public static void saveUserInformation(String userId, String canvasAccessToken, SlashCommandContext ctx) {
+        String response = "s";
         Connection conn = establishConnection();
 
         // query inserts new users into DB and updates existing users' tokens
@@ -76,16 +77,18 @@ public class Main {
             stmt.setString(3, canvasAccessToken);
 
             stmt.executeUpdate();
+            response = ":heavy_check_mark: We have successfully saved your token!";
         } catch(SQLException e) {
             e.printStackTrace();
-            try {
-                ctx.respond(asBlocks(section(s -> s.text(markdownText(
-                        "hmm.. we're having trouble saving your token. " +
-                                "\n\nWe'll notify our developers immediately"
-                )))));
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+            response = "hmm.. we're having trouble saving your token. " +
+                    "\n\nWe'll notify our developers immediately";
+        }
+
+        try {
+            String finalResponse = response;
+            ctx.respond(asBlocks(section(s -> s.text(markdownText(finalResponse)))));
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
         }
     }
 
@@ -148,7 +151,6 @@ public class Main {
             return ctx.ack("Token received...");
             });
 
-
         app.command("/upcoming-assignments", (req, ctx) -> {
             // launch thread to get upcoming assignments.
             new Thread(() -> {
@@ -162,7 +164,7 @@ public class Main {
 
                             section(s -> s.text(markdownText(upcomingAssignments)))
                     ));
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     try {
                         ctx.respond(asBlocks(

@@ -154,7 +154,6 @@ public class CanvasGetter {
         return formattedAssignment;
     }
 
-
     private String getNoAssignmentsDueString() {
         return ":tada::balloon::confetti_ball:".repeat(4)
                 + "\n:confetti_ball:" + " ".repeat(58)

@@ -1,6 +1,7 @@
 package com;
 
 import com.slack.api.bolt.App;
+import com.slack.api.bolt.context.builtin.SlashCommandContext;
 import com.slack.api.bolt.jetty.SlackAppServer;
 import com.slack.api.model.block.composition.TextObject;
 
@@ -60,7 +61,8 @@ public class Main {
         return null;
     }
 
-    public static void saveUserInformation(String userId, String canvasAccessToken) {
+    public static void saveUserInformation(String userId, String canvasAccessToken, SlashCommandContext ctx) {
+        String response = "s";
         Connection conn = establishConnection();
 
         // query inserts new users into DB and updates existing users' tokens
@@ -75,8 +77,18 @@ public class Main {
             stmt.setString(3, canvasAccessToken);
 
             stmt.executeUpdate();
+            response = ":heavy_check_mark: We have successfully saved your token!";
         } catch(SQLException e) {
             e.printStackTrace();
+            response = "hmm.. we're having trouble saving your token. " +
+                    "\n\nWe'll notify our developers immediately";
+        }
+
+        try {
+            String finalResponse = response;
+            ctx.respond(asBlocks(section(s -> s.text(markdownText(finalResponse)))));
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
         }
     }
 
@@ -127,7 +139,7 @@ public class Main {
                 divider(),
 
                 section(s -> s.text(markdownText("/*helloworld* - To get this message again"))),
-                section(s -> s.text(markdownText("/*canvas-authenticate* - To connect to Canvas (you only have to do it once!)"))),
+                section(s -> s.text(markdownText("/*authenticate-canvas* - To connect to Canvas (you only have to do it once!)"))),
                 section(s -> s.text(markdownText("/*upcoming-assignments* - get all upcoming assignments")))
             ));
         });
@@ -139,11 +151,10 @@ public class Main {
 
             // We need to acknowledge the user's command within 3000 ms, (3 seconds),
             // so we'll do these operations completely independent from the ctx.ack (acknowledgement)
-            new Thread(() -> saveUserInformation(userId, canvasAccessToken)).start();
+            new Thread(() -> saveUserInformation(userId, canvasAccessToken, ctx)).start();
 
-            return ctx.ack("We've received your token. You should be able to make requests now.");
+            return ctx.ack("Token received...");
             });
-            
 
         app.command("/upcoming-assignments", (req, ctx) -> {
             // launch thread to get upcoming assignments.
@@ -158,8 +169,18 @@ public class Main {
 
                             section(s -> s.text(markdownText(upcomingAssignments)))
                     ));
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
+                    try {
+                        ctx.respond(asBlocks(
+                                divider(),
+                                section(s -> s.text(markdownText(":no_entry_sign: We couldn't get " +
+                                                "in to your Canvas account. :no_entry_sign:" +
+                                                "\n\nYour token may have expired.")))
+                        ));
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
                 }
             }).start();
 

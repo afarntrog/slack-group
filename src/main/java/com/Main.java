@@ -122,7 +122,7 @@ public class Main {
         // display usage information and instructions here
         app.command("/helloworld", (req, ctx) -> {
             return ctx.ack(asBlocks(
-                section(s -> s.text(markdownText(":wave: from AARON SlackCan!"))),
+                section(s -> s.text(markdownText(":wave: from SlackCan!"))),
                 section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack."))),
                 
                 divider(),
@@ -142,19 +142,7 @@ public class Main {
         app.command("/give", (req, ctx) -> {
             return ctx.ack(asBlocks(
                     section(s -> s.text(markdownText(":wave: from SlackCan!"))),
-                    section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack."))),
-
-                    divider(),
-
-                    section(s -> s.text(markdownText(":memo: To  here."))),
-                    section(s -> s.text(markdownText(":one: Ok, now you can run /canvas-authenticate <token> (put your canvas token after the slash command)"))),
-                    section(s -> s.text(markdownText(":two: That's all it takes! You're officially connected to Canvas now. Below are a few commands you can get started with."))),
-
-                    divider(),
-
-                    section(s -> s.text(markdownText("/*helloworld* - To get this message again"))),
-                    section(s -> s.text(markdownText("/*authenticate-canvas* - To connect to Canvas (you only have to do it once!)"))),
-                    section(s -> s.text(markdownText("/*upcoming-assignments* - get all upcoming assignments")))
+                    section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack.")))
             ));
         });
 

@@ -139,13 +139,24 @@ public class Main {
             ));
         });
 
-        app.command("/give-me-course-list", (req, ctx) -> {
+        app.command("//give-me-course-list", (req, ctx) -> {
             return ctx.ack(asBlocks(
                     section(s -> s.text(markdownText(":wave: from SlackCan!"))),
-                    section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack.")))
+                    section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack."))),
+
+                    divider(),
+
+                    section(s -> s.text(markdownText(":memo: To  here."))),
+                    section(s -> s.text(markdownText(":one: Ok, now you can run /canvas-authenticate <token> (put your canvas token after the slash command)"))),
+                    section(s -> s.text(markdownText(":two: That's all it takes! You're officially connected to Canvas now. Below are a few commands you can get started with."))),
+
+                    divider(),
+
+                    section(s -> s.text(markdownText("/*helloworld* - To get this message again"))),
+                    section(s -> s.text(markdownText("/*authenticate-canvas* - To connect to Canvas (you only have to do it once!)"))),
+                    section(s -> s.text(markdownText("/*upcoming-assignments* - get all upcoming assignments")))
             ));
         });
-
 
 
 
@@ -160,37 +171,37 @@ public class Main {
             return ctx.ack("Token received...");
             });
 
-//        app.command("/upcoming-assignments", (req, ctx) -> {
-//            // launch thread to get upcoming assignments.
-//            new Thread(() -> {
-//                try {
-//                    CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
-//                    String upcomingAssignments = canvasGetter.getUpcomingAssignments();
-//                    ctx.respond(asBlocks(
-//                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:*"))),
-//
-//                            divider(),
-//
-//                            section(s -> s.text(markdownText(upcomingAssignments)))
-//                    ));
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    try {
-//                        ctx.respond(asBlocks(
-//                                divider(),
-//                                section(s -> s.text(markdownText(":no_entry_sign: We couldn't get " +
-//                                                "in to your Canvas account. :no_entry_sign:" +
-//                                                "\n\nYour token may have expired.")))
-//                        ));
-//                    } catch (Exception ee) {
-//                        ee.printStackTrace();
-//                    }
-//                }
-//            }).start();
+        app.command("/upcoming-assignments", (req, ctx) -> {
+            // launch thread to get upcoming assignments.
+            new Thread(() -> {
+                try {
+                    CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
+                    String upcomingAssignments = canvasGetter.getUpcomingAssignments();
+                    ctx.respond(asBlocks(
+                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:*"))),
 
-//            System.out.println("THREAD+++++++ " + Thread.activeCount());
-//            return ctx.ack("We're getting the info now...");
-//        });
+                            divider(),
+
+                            section(s -> s.text(markdownText(upcomingAssignments)))
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    try {
+                        ctx.respond(asBlocks(
+                                divider(),
+                                section(s -> s.text(markdownText(":no_entry_sign: We couldn't get " +
+                                                "in to your Canvas account. :no_entry_sign:" +
+                                                "\n\nYour token may have expired.")))
+                        ));
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            }).start();
+
+            System.out.println("THREAD+++++++ " + Thread.activeCount());
+            return ctx.ack("We're getting the info now...");
+        });
 
 
         int port = Integer.parseInt(environment.get("PORT"));

@@ -170,10 +170,10 @@ public class Main {
                 try {
                     CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
                     String assignmentsForCourse = canvasGetter.getAssignmentsForCourse(courseNumber);
-                    String courseName =  canvasGetter.getCourse(courseNumber).getName();
+//                    String courseName =  canvasGetter.getCourse(courseNumber).getName();
                     ctx.respond(asBlocks(
                             section(s -> s.text(markdownText("You chose " + courseNumber))),
-                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:* for: " + courseName))),
+                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:* for: "))),
                             divider(),
                             section(s -> s.text(markdownText(assignmentsForCourse)))
                     ));

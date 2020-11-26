@@ -140,11 +140,27 @@ public class Main {
         });
 
         app.command("/give", (req, ctx) -> {
-            return ctx.ack(asBlocks(
-                    section(s -> s.text(markdownText(":wave: from SlackCan!"))),
-                    section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack.")))
-            ));
+
+            // Returns a numbered list that contains the Courses.
+            new Thread(() -> {
+                try {
+                    CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
+                    String getNumberedListOfCourses = canvasGetter.getNumberedListOfCourses();
+                    ctx.respond(asBlocks(
+                            section(s -> s.text(markdownText(":wave: Choose a number from the following courses to view the assignments for that course."))),
+                            section(s -> s.text(markdownText("Run the following command. /get-me-ass and pass in a number: "))),
+                            divider(),
+                            section(s -> s.text(markdownText(getNumberedListOfCourses)))
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            System.out.println("THREAD+++++++ " + Thread.activeCount());
+            return ctx.ack("We're getting the info now...");
         });
+
 
 
 

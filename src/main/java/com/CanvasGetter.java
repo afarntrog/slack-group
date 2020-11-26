@@ -126,6 +126,25 @@ public class CanvasGetter {
         return stringBuilder.toString();
     }
 
+
+    public String getNumberedListOfCourses() throws IOException {
+        /*
+            Return a formatted numbered list of courses. User can use it to choose a course.
+         */
+        StringBuilder stringBuilder = new StringBuilder();
+        int i = 1;
+        for (Course course : getCourses()) {
+            stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + i + course.getName() + ":* \n \n");
+        }
+        return stringBuilder.toString();
+    }
+
+
+
+
+
+
+
     private String formatAssignment(Assignment as, int i) {
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, hh:mm a z");
         //formatter.setTimeZone(TimeZone.getDefault());

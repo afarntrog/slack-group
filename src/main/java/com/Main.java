@@ -139,7 +139,7 @@ public class Main {
             ));
         });
 
-        app.command("/give", (req, ctx) -> {
+        app.command("/course-assignment-list", (req, ctx) -> {
 
             // Returns a numbered list that contains the Courses.
             new Thread(() -> {
@@ -147,7 +147,10 @@ public class Main {
                     CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
                     String getNumberedListOfCourses = canvasGetter.getNumberedListOfCourses();
                     ctx.respond(asBlocks(
-                            section(s -> s.text(markdownText(":wave: Choose a number from the following courses to view the assignments for that course."))),
+                            divider(),
+                            divider(),
+                            divider(),
+                            section(s -> s.text(markdownText(":thinking_face: Choose a number from the following courses to view the assignments for that course."))),
                             section(s -> s.text(markdownText("Run the following command. /get-me-ass and pass in a number: "))),
                             divider(),
                             section(s -> s.text(markdownText(getNumberedListOfCourses)))

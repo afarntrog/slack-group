@@ -144,7 +144,7 @@ public class CanvasGetter {
 //        }
 
         for (Course course : listOfCoursesHaveAssignments()) {
-            stringBuilder.append("\n\n\n" + (i++) +  ")  :notebook_with_decorative_cover: *)" + course.getName() + ":* \n \n");
+            stringBuilder.append("\n\n\n" + (i++) +  ")  :notebook_with_decorative_cover: *" + course.getName() + ":* \n \n");
         }
         return stringBuilder.toString();
     }

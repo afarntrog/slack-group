@@ -122,7 +122,7 @@ public class Main {
         // display usage information and instructions here
         app.command("/helloworld", (req, ctx) -> {
             return ctx.ack(asBlocks(
-                section(s -> s.text(markdownText(":wave: from SlackCan!"))),
+                section(s -> s.text(markdownText(":wave: from AARON SlackCan!"))),
                 section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack."))),
                 
                 divider(),

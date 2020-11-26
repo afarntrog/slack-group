@@ -150,7 +150,7 @@ public class CanvasGetter {
             if (course != null)
                 return getFormattedAssignments(getAssignments(course));
         } catch (Exception e) {
-            return getNoAssignmentsDueString() + "WE COULD NOT FIND ANYTHING";
+            return getNoAssignmentsDueString() + "WE COULD NOT FIND ANYTHING\n" + Arrays.toString(e.getStackTrace());
         }
         return "There are no results for that course";
     }
@@ -166,6 +166,10 @@ public class CanvasGetter {
     }
 
     public Course getCourse(int courseNumber) throws IOException {
+        List<Course> myCourses = getCourses();
+        for (int i = 0; i < myCourses.size(); i++) {
+
+        }
         int i = 1;
         for (Course course : getCourses()) {
             if (i++ == courseNumber)

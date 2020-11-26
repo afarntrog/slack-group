@@ -135,14 +135,7 @@ public class CanvasGetter {
             User can use it to choose a course.
          */
         StringBuilder stringBuilder = new StringBuilder();
-
         int i = 1;
-//        for(Course course : getCourses()) {
-//            if (courseHasAssignments(course)) {
-//                stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + (i++) + course.getName() + ":* \n \n");
-//            }
-//        }
-
         for (Course course : listOfCoursesHaveAssignments()) {
             stringBuilder.append("\n\n\n" + (i++) +  ")  :notebook_with_decorative_cover: *" + course.getName() + ":* \n \n");
         }
@@ -207,27 +200,15 @@ public class CanvasGetter {
     }
 
     public Course getCourse(int courseNumber) throws IOException {
+        /*
+            Returns a course object for the given number. Courses position in the list.
+         */
         List<Course> myCourses = listOfCoursesHaveAssignments();
         for (int i = 0; i < myCourses.size(); i++) {
             if (courseNumber == (i+1))
                 return myCourses.get(i);
         }
-//        int i = 1;
-//        for (Course course : getCourses()) {
-//            if (i++ == courseNumber)
-//                return course;
-//        }
         return null;
-    }
-
-    private String getFormattedAssignments(List<Assignment> assignments) {
-        if (assignments.size() == 0) return getNoAssignmentsDueString();
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < assignments.size(); i++) {
-            stringBuilder.append(formatAssignment(assignments.get(i), 1));
-        }
-        stringBuilder.append("RAHHHHHHHHHHHHHH");
-        return stringBuilder.toString();
     }
 
     private String formatAssignment(Assignment as, int i) {

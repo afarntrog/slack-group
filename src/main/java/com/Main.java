@@ -161,7 +161,7 @@ public class Main {
             }).start();
 
             System.out.println("THREAD+++++++ " + Thread.activeCount());
-            return ctx.ack("We're getting the info now...");
+            return ctx.ack("We're getting all your courses that have assignments ...");
         });
 
 
@@ -186,7 +186,7 @@ public class Main {
             }).start();
 
             System.out.println("THREAD+++++++ " + Thread.activeCount());
-            return ctx.ack("We're getting the info now...");
+            return ctx.ack("We're getting your upcoming assignments for chose number " + courseNumber + "...");
         });
 
 

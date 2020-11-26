@@ -145,9 +145,13 @@ public class CanvasGetter {
         /*
             Return a formatted list of assignments for an upcoming course.
          */
-        Course course = getCourse(courseNumber);
-        if (course != null)
-            return getFormattedAssignments(getAssignments(course));
+        try {
+            Course course = getCourse(courseNumber);
+            if (course != null)
+                return getFormattedAssignments(getAssignments(course));
+        } catch (Exception e) {
+            return getNoAssignmentsDueString() + "WE COULD NOT FIND ANYTHING";
+        }
         return "There are no results for that course";
     }
 

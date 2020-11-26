@@ -89,43 +89,6 @@ public class CanvasGetter {
         return stringBuilder.toString();
     }
 
-//    public String getUpcomingAssignments(Course specificCourse) throws IOException {
-//        ArrayList<String> upcomingAssignments = new ArrayList<>();
-//        StringBuilder stringBuilder = new StringBuilder();
-//
-//        List<Course> myCourses = getCourses();
-//        List<Assignment> assignments;
-//
-//        LOG.info("Got " + myCourses.size() + " courses back from Canvas: ");
-//
-//        for(Course course : myCourses) {
-//            LOG.info("  " + course.getName());
-//
-//            assignments = getAssignments(course);
-//            int i = 1;
-//            for (Assignment as : assignments) {
-//                Date date = as.getDueAt();
-//                if (date != null) {
-//                    Date today = new Date();
-//                    if (today.before(date)) {   // not yet due.
-//                        if (i == 1) {           // if first in course, append course name
-//                            LOG.info("appending course name: " + course.getName());
-//                            stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *"
-//                                    + course.getName() + ":* \n \n");
-//                        }
-//                        LOG.info("formatting assignment: " + as.getName());
-//                        stringBuilder.append(formatAssignment(as, i++));
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (stringBuilder.length() == 0) {      // if no assignments due
-//            stringBuilder.append(getNoAssignmentsDueString());
-//        }
-//
-//        return stringBuilder.toString();
-//    }
 
     public String getUpcomingAssignments() throws IOException {
         ArrayList<String> upcomingAssignments = new ArrayList<>();
@@ -168,21 +131,51 @@ public class CanvasGetter {
 
     public String getNumberedListOfCourses() throws IOException {
         /*
-            Return a formatted numbered list of courses. User can use it to choose a course.
+            Return a formatted numbered list of courses. **Only** include courses that have assignments.
+            User can use it to choose a course.
          */
         StringBuilder stringBuilder = new StringBuilder();
+
         int i = 1;
-        for (Course course : getCourses()) {
-            stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + (i++) + course.getName() + ":* \n \n");
+        for(Course course : getCourses()) {
+            if (courseHasAssignments(course)) {
+                stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + (i++) + course.getName() + ":* \n \n");
+            }
         }
+
+
+
+
+
+
+
+//        StringBuilder stringBuilder = new StringBuilder();
+//        int i = 1;
+//        for (Course course : getCourses()) {
+//            stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + (i++) + course.getName() + ":* \n \n");
+//        }
         return stringBuilder.toString();
     }
 
+    private boolean courseHasAssignments(Course course) throws IOException {
+//        List<Assignment> assignments = getAssignments(course);
+        for (Assignment as : getAssignments(course)) {
+            Date date = as.getDueAt();
+            if (date != null) {
+                Date today = new Date();
+                if (today.before(date)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 
     public String getAssignmentsForCourse(int courseNumber) throws IOException {
         /*
             Return a formatted list of assignments for an upcoming course.
+            todo make this only show  a list of classes that have assignmnets
          */
         try {
             StringBuilder stringBuilder = new StringBuilder();

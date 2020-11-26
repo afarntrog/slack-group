@@ -148,15 +148,16 @@ public class CanvasGetter {
         Course course = getCourse(courseNumber);
         if (course != null)
             return getFormattedAssignments(getAssignments(course));
-        return "";
+        return "There are no results for that course";
     }
 
     private String getFormattedAssignments(List<Assignment> assignments) {
         if (assignments.size() == 0) return getNoAssignmentsDueString();
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < assignments.size(); i++) {
-            stringBuilder.append(formatAssignment(assignments.get(i), (i+1)));
+            stringBuilder.append(formatAssignment(assignments.get(i), 1));
         }
+        stringBuilder.append("RAHHHHHHHHHHHHHH");
         return stringBuilder.toString();
     }
 

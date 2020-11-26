@@ -137,28 +137,30 @@ public class CanvasGetter {
         StringBuilder stringBuilder = new StringBuilder();
 
         int i = 1;
-        for(Course course : getCourses()) {
-            if (courseHasAssignments(course)) {
-                stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + (i++) + course.getName() + ":* \n \n");
-            }
-        }
-
-
-
-
-
-
-
-//        StringBuilder stringBuilder = new StringBuilder();
-//        int i = 1;
-//        for (Course course : getCourses()) {
-//            stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + (i++) + course.getName() + ":* \n \n");
+//        for(Course course : getCourses()) {
+//            if (courseHasAssignments(course)) {
+//                stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + (i++) + course.getName() + ":* \n \n");
+//            }
 //        }
+
+        for (Course course : listOfCoursesHaveAssignments()) {
+            stringBuilder.append("\n\n\n" + (i++) +  ")  :notebook_with_decorative_cover: *)" + course.getName() + ":* \n \n");
+        }
         return stringBuilder.toString();
     }
 
+
+    public List<Course> listOfCoursesHaveAssignments() throws IOException {
+        List<Course> myCourses = getCourses();
+        List<Course> courseResults = new ArrayList<>();
+        for(Course course : myCourses) {
+            if (courseHasAssignments(course))
+                courseResults.add(course);
+        }
+        return courseResults;
+    }
+
     private boolean courseHasAssignments(Course course) throws IOException {
-//        List<Assignment> assignments = getAssignments(course);
         for (Assignment as : getAssignments(course)) {
             Date date = as.getDueAt();
             if (date != null) {
@@ -189,23 +191,33 @@ public class CanvasGetter {
                     if (date != null) {
                         Date today = new Date();
                         if (today.before(date)) {   // not yet due.
-
                             if (i == 1) {           // if first in course, append course name
-                                LOG.info("appending course name: " + course.getName());
-                                stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *"
-                                        + course.getName() + ":* \n \n");
+                                stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *" + course.getName() + ":* \n \n");
                             }
-                            LOG.info("formatting assignment: " + as.getName());
                             stringBuilder.append(formatAssignment(as, i++));
                         }
                     }
                 }
-                return stringBuilder.toString(); //getFormattedAssignments(getAssignments(course));
+                return stringBuilder.toString();
             }
         } catch (Exception e) {
             return getNoAssignmentsDueString() + "WE COULD NOT FIND ANYTHING\n" + Arrays.toString(e.getStackTrace());
         }
         return "There are no results for that course";
+    }
+
+    public Course getCourse(int courseNumber) throws IOException {
+        List<Course> myCourses = listOfCoursesHaveAssignments();
+        for (int i = 0; i < myCourses.size(); i++) {
+            if (courseNumber == (i+1))
+                return myCourses.get(i);
+        }
+//        int i = 1;
+//        for (Course course : getCourses()) {
+//            if (i++ == courseNumber)
+//                return course;
+//        }
+        return null;
     }
 
     private String getFormattedAssignments(List<Assignment> assignments) {
@@ -216,19 +228,6 @@ public class CanvasGetter {
         }
         stringBuilder.append("RAHHHHHHHHHHHHHH");
         return stringBuilder.toString();
-    }
-
-    public Course getCourse(int courseNumber) throws IOException {
-        List<Course> myCourses = getCourses();
-        for (int i = 0; i < myCourses.size(); i++) {
-
-        }
-        int i = 1;
-        for (Course course : getCourses()) {
-            if (i++ == courseNumber)
-                return course;
-        }
-        return null;
     }
 
     private String formatAssignment(Assignment as, int i) {

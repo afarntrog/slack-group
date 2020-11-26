@@ -152,19 +152,20 @@ public class CanvasGetter {
     }
 
     private String getFormattedAssignments(List<Assignment> assignments) {
-        if (assignments.size() == 1) return getNoAssignmentsDueString();
+        if (assignments.size() == 0) return getNoAssignmentsDueString();
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < assignments.size(); i++) {
-            stringBuilder.append(formatAssignment(assignments.get(i), i+1));
+            stringBuilder.append(formatAssignment(assignments.get(i), (i+1)));
         }
         return stringBuilder.toString();
     }
 
     public Course getCourse(int courseNumber) throws IOException {
         int i = 1;
-        for (Course course : getCourses())
-            if (i++ == courseNumber) return course;
-
+        for (Course course : getCourses()) {
+            if (i++ == courseNumber)
+                return course;
+        }
         return null;
     }
 

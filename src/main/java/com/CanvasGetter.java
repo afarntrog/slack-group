@@ -189,6 +189,7 @@ public class CanvasGetter {
             Course course = getCourse(courseNumber);
             if (course != null) {
                 List<Assignment> assignments = getAssignments(course);
+                if (assignments == null || assignments.size() <1) return "There are no asses";
                 int i = 1;
                 for (Assignment as : assignments) {
                     Date date = as.getDueAt();

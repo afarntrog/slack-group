@@ -173,7 +173,7 @@ public class Main {
 //                    String courseName =  canvasGetter.getCourse(courseNumber).getName();
                     ctx.respond(asBlocks(
                             section(s -> s.text(markdownText("You chose " + courseNumber))),
-                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:* for: "))),
+                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:*"))),
                             divider(),
                             section(s -> s.text(markdownText(assignmentsForCourse)))
                     ));

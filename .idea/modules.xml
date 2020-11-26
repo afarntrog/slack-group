@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/slack-group.iml" filepath="$PROJECT_DIR$/slack-group.iml" />
+      <module fileurl="file://$PROJECT_DIR$/testerslack.iml" filepath="$PROJECT_DIR$/testerslack.iml" />
     </modules>
   </component>
 </project>

@@ -134,16 +134,39 @@ public class CanvasGetter {
         StringBuilder stringBuilder = new StringBuilder();
         int i = 1;
         for (Course course : getCourses()) {
-            stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + i + course.getName() + ":* \n \n");
+            stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *)" + (i++) + course.getName() + ":* \n \n");
         }
         return stringBuilder.toString();
     }
 
 
 
+    public String getAssignmentsForCourse(int courseNumber) throws IOException {
+        /*
+            Return a formatted list of assignments for an upcoming course.
+         */
+        Course course = getCourse(courseNumber);
+        if (course != null)
+            return getFormattedAssignments(getAssignments(course));
+        return "";
+    }
 
+    private String getFormattedAssignments(List<Assignment> assignments) {
+        if (assignments.size() == 1) return getNoAssignmentsDueString();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < assignments.size(); i++) {
+            stringBuilder.append(formatAssignment(assignments.get(i), i+1));
+        }
+        return stringBuilder.toString();
+    }
 
+    public Course getCourse(int courseNumber) throws IOException {
+        int i = 1;
+        for (Course course : getCourses())
+            if (i++ == courseNumber) return course;
 
+        return null;
+    }
 
     private String formatAssignment(Assignment as, int i) {
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM d, hh:mm a z");

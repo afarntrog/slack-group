@@ -162,6 +162,29 @@ public class Main {
         });
 
 
+        app.command("/get-me-ass", (req, ctx) -> {
+            int courseNumber = Integer.parseInt(req.getPayload().getText());
+
+            // Returns a numbered list that contains the Courses.
+            new Thread(() -> {
+                try {
+                    CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
+                    String assignmentsForCourse = canvasGetter.getAssignmentsForCourse(courseNumber);
+                    String courseName =  canvasGetter.getCourse(courseNumber).getName();
+                    ctx.respond(asBlocks(
+                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:* for: " + courseName))),
+                            divider(),
+                            section(s -> s.text(markdownText(assignmentsForCourse)))
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            System.out.println("THREAD+++++++ " + Thread.activeCount());
+            return ctx.ack("We're getting the info now...");
+        });
+
 
 
         app.command("/authenticate-canvas", (req, ctx) -> {

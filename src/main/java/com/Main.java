@@ -142,9 +142,7 @@ public class Main {
         app.command("/give-me-course-list", (req, ctx) -> {
             return ctx.ack(asBlocks(
                     section(s -> s.text(markdownText(":wave: from SlackCan!"))),
-                    section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack."))),
-
-                    divider()
+                    section(s -> s.text(markdownText("Our goal is to place Canvas's most important information at a student's fingertips, right in Slack.")))
             ));
         });
 
@@ -190,9 +188,9 @@ public class Main {
 //                }
 //            }).start();
 
-            System.out.println("THREAD+++++++ " + Thread.activeCount());
-            return ctx.ack("We're getting the info now...");
-        });
+//            System.out.println("THREAD+++++++ " + Thread.activeCount());
+//            return ctx.ack("We're getting the info now...");
+//        });
 
 
         int port = Integer.parseInt(environment.get("PORT"));

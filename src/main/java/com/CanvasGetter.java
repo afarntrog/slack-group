@@ -28,6 +28,7 @@ import edu.ksu.canvas.requestOptions.MultipleSubmissionsOptions.StudentSubmissio
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -105,6 +106,7 @@ public class CanvasGetter {
         return stringBuilder.toString();
     }
 
+
     public String getUpcomingAssignments() throws IOException {
         ArrayList<String> upcomingAssignments = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
@@ -141,6 +143,89 @@ public class CanvasGetter {
         }
 
         return stringBuilder.toString();
+    }
+
+
+    public String getNumberedListOfCourses() throws IOException {
+        /*
+            Return a formatted numbered list of courses. **Only** include courses that have assignments.
+            User can use it to choose a course.
+         */
+        StringBuilder stringBuilder = new StringBuilder();
+        int i = 1;
+        for (Course course : listOfCoursesHaveAssignments()) {
+            stringBuilder.append("\n\n\n" + (i++) +  ")  :notebook_with_decorative_cover: *" + course.getName() + ":* \n \n");
+        }
+        return stringBuilder.toString();
+    }
+
+
+    public List<Course> listOfCoursesHaveAssignments() throws IOException {
+        List<Course> myCourses = getCourses();
+        List<Course> courseResults = new ArrayList<>();
+        for(Course course : myCourses) {
+            if (courseHasAssignments(course))
+                courseResults.add(course);
+        }
+        return courseResults;
+    }
+
+    private boolean courseHasAssignments(Course course) throws IOException {
+        for (Assignment as : getAssignments(course)) {
+            Date date = as.getDueAt();
+            if (date != null) {
+                Date today = new Date();
+                if (today.before(date)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    public String getAssignmentsForCourse(int courseNumber) throws IOException {
+        /*
+            Return a formatted list of assignments for an upcoming course.
+            todo make this only show  a list of classes that have assignmnets
+         */
+        try {
+            StringBuilder stringBuilder = new StringBuilder();
+            Course course = getCourse(courseNumber);
+            if (course != null) {
+                List<Assignment> assignments = getAssignments(course);
+                if (assignments == null || assignments.size() <1) return "There are no asses";
+                int i = 1;
+                for (Assignment as : assignments) {
+                    Date date = as.getDueAt();
+                    if (date != null) {
+                        Date today = new Date();
+                        if (today.before(date)) {   // not yet due.
+                            if (i == 1) {           // if first in course, append course name
+                                stringBuilder.append("\n\n\n:notebook_with_decorative_cover: *" + course.getName() + ":* \n \n");
+                            }
+                            stringBuilder.append(formatAssignment(as, i++));
+                        }
+                    }
+                }
+                return stringBuilder.toString();
+            }
+        } catch (Exception e) {
+            return getNoAssignmentsDueString() + "WE COULD NOT FIND ANYTHING\n" + Arrays.toString(e.getStackTrace());
+        }
+        return "There are no results for that course";
+    }
+
+    public Course getCourse(int courseNumber) throws IOException {
+        /*
+            Returns a course object for the given number. Courses position in the list.
+         */
+        List<Course> myCourses = listOfCoursesHaveAssignments();
+        for (int i = 0; i < myCourses.size(); i++) {
+            if (courseNumber == (i+1))
+                return myCourses.get(i);
+        }
+        return null;
     }
 
     private String formatAssignment(Assignment as, int i) {

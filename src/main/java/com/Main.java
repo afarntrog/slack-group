@@ -144,6 +144,57 @@ public class Main {
             ));
         });
 
+        app.command("/course-assignment-list", (req, ctx) -> {
+
+            // Returns a numbered list that contains the Courses.
+            new Thread(() -> {
+                try {
+                    CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
+                    String getNumberedListOfCourses = canvasGetter.getNumberedListOfCourses();
+                    ctx.respond(asBlocks(
+                            divider(),
+                            divider(),
+                            divider(),
+                            section(s -> s.text(markdownText(":thinking_face: Choose a number from the following courses to view the assignments for that course."))),
+                            section(s -> s.text(markdownText("Run the following command. /get-me-ass and pass in a number: "))),
+                            divider(),
+                            section(s -> s.text(markdownText(getNumberedListOfCourses)))
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            System.out.println("THREAD+++++++ " + Thread.activeCount());
+            return ctx.ack("We're getting all your courses that have assignments ...");
+        });
+
+
+        app.command("/get-me-ass", (req, ctx) -> {
+            int courseNumber = Integer.parseInt(req.getPayload().getText());
+
+            // Returns a numbered list that contains the Courses.
+            new Thread(() -> {
+                try {
+                    CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
+                    String assignmentsForCourse = canvasGetter.getAssignmentsForCourse(courseNumber);
+//                    String courseName =  canvasGetter.getCourse(courseNumber).getName();
+                    ctx.respond(asBlocks(
+                            section(s -> s.text(markdownText("You chose number: " + courseNumber))),
+                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:*"))),
+                            divider(),
+                            section(s -> s.text(markdownText(assignmentsForCourse)))
+                    ));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            System.out.println("THREAD+++++++ " + Thread.activeCount());
+            return ctx.ack("We're getting your upcoming assignments for chose number " + courseNumber + "...");
+        });
+
+
 
         app.command("/authenticate-canvas", (req, ctx) -> {
             String userId = req.getPayload().getUserId();

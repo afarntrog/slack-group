@@ -42,8 +42,8 @@ public class Main {
     static String databaseURL  = environment.get("JDBC_DATABASE_URL");
     static String databaseUsername = environment.get("JDBC_DATABASE_USERNAME");
     static String databasePassword = environment.get("JDBC_DATABASE_PASSWORD");
-
-
+    protected static String response = "";
+    
     public static Connection establishConnection() {
         try {
             Class.forName("org.postgresql.Driver");    
@@ -62,7 +62,6 @@ public class Main {
     }
 
     public static void saveUserInformation(String userId, String canvasAccessToken, SlashCommandContext ctx) {
-        String response = "s";
         Connection conn = establishConnection();
 
         // query inserts new users into DB and updates existing users' tokens
@@ -113,7 +112,12 @@ public class Main {
 
     public static CanvasGetter setupCanvasGetter(String userId) {
         String canvasAuthToken = getCanvasTokenFromUserId(userId);
-        return new CanvasGetter(canvasAuthToken);
+
+        if(!canvasAuthToken.equals("")) {
+            return new CanvasGetter(canvasAuthToken);
+        } else {
+            return null;
+        }
     }
 
     public static void main(String[] args) throws Exception {

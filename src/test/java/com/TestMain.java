@@ -20,7 +20,7 @@ public class TestMain {
 
     @Test 
     public void testSaveUserInformationUsesCorrectResponseForUnsuccessfulOperation() {
-        Main.saveUserInformation("U01DN1LCYEA", "10898~59dEJ3WL5f25MgGgDemzcQvvtzG23b8sDcl9stx2bI1K9Y9HzJ1WgOP21rmup0ag", new SlashCommandContext());
+        Main.saveUserInformation("wrong user identifcation", "10898~59dEJ3WL5f25MgGgDemzcQvvtzG23b8sDcl9stx2bI1K9Y9HzJ1WgOP21rmup0ag", new SlashCommandContext());
         assertEquals("hmm.. we're having trouble saving your token. \n\nWe'll notify our developers immediately", Main.response);
     }
 

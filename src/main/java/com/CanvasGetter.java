@@ -2,14 +2,19 @@ package com;
 
 import edu.ksu.canvas.CanvasApiFactory;
 import edu.ksu.canvas.TestLauncher;
+import edu.ksu.canvas.exception.ObjectNotFoundException;
 import edu.ksu.canvas.interfaces.AccountReader;
 import edu.ksu.canvas.interfaces.AssignmentReader;
 import edu.ksu.canvas.interfaces.CourseReader;
+import edu.ksu.canvas.interfaces.PageReader;
 import edu.ksu.canvas.interfaces.QuizReader;
 import edu.ksu.canvas.interfaces.SubmissionReader;
 import edu.ksu.canvas.model.Account;
 import edu.ksu.canvas.model.Course;
+import edu.ksu.canvas.model.Page;
 import edu.ksu.canvas.model.assignment.Assignment;
+import edu.ksu.canvas.model.assignment.Quiz;
+import edu.ksu.canvas.model.assignment.Submission;
 import edu.ksu.canvas.oauth.NonRefreshableOauthToken;
 import edu.ksu.canvas.oauth.OauthToken;
 import edu.ksu.canvas.requestOptions.GetSingleAssignmentOptions;
@@ -18,6 +23,8 @@ import edu.ksu.canvas.requestOptions.ListCourseAssignmentsOptions;
 import edu.ksu.canvas.requestOptions.ListCurrentUserCoursesOptions;
 import edu.ksu.canvas.requestOptions.ListUserAssignmentOptions;
 import edu.ksu.canvas.requestOptions.ListCurrentUserCoursesOptions.Include;
+import edu.ksu.canvas.requestOptions.MultipleSubmissionsOptions.StudentSubmissionOption;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +73,16 @@ public class CanvasGetter {
 
         String courseId = Integer.toString(course.getId());
         return assignmentReader.listCourseAssignments(new ListCourseAssignmentsOptions(courseId));
+    }
+
+    public List<Page> getPages(Course course) throws IOException {
+        PageReader pageReader = canvasApiFactory.getReader(PageReader.class, oauthToken);
+        return pageReader.listPagesInCourse(Integer.toString(course.getId()));
+    }
+
+    public List<Quiz> getQuizzes(Course course) throws IOException {
+        QuizReader quizReader = canvasApiFactory.getReader(QuizReader.class, oauthToken);
+        return quizReader.getQuizzesInCourse(Integer.toString(course.getId()));
     }
 
     public String getOwnCourses() throws IOException {

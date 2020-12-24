@@ -170,14 +170,14 @@ public class CanvasGetter {
     public String getAssignmentsForCourse(int courseNumber) throws IOException {
         /*
             Return a formatted list of assignments for an upcoming course.
-            todo make this only show  a list of classes that have assignmnets
+            todo make this only show a list of classes that have assignments
          */
         try {
             StringBuilder stringBuilder = new StringBuilder();
             Course course = getCourse(courseNumber);
             if (course != null) {
                 List<Assignment> assignments = getAssignments(course);
-                if (assignments == null || assignments.size() <1) return "There are no asses";
+                if (assignments == null || assignments.size() <1) return "There are no assignments";
                 int i = 1;
                 for (Assignment as : assignments) {
                     Date date = as.getDueAt();

@@ -162,10 +162,8 @@ public class Main {
                     String getNumberedListOfCourses = canvasGetter.getNumberedListOfCourses();
                     ctx.respond(asBlocks(
                             divider(),
-                            divider(),
-                            divider(),
                             section(s -> s.text(markdownText(":thinking_face: Choose a number from the following courses to view the assignments for that course."))),
-                            section(s -> s.text(markdownText("Run the following command. /get-me-ass and pass in a number: "))),
+                            section(s -> s.text(markdownText("Run this command: */course-assignments* and pass in a course number:"))),
                             divider(),
                             section(s -> s.text(markdownText(getNumberedListOfCourses)))
                     ));

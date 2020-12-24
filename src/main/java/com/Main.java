@@ -140,7 +140,7 @@ public class Main {
                 divider(),
                 
                 section(s -> s.text(markdownText(":memo: To setup your account, first follow our basic tutorial on getting an access token from Canvas's dashboard. Once you have it, come back here."))),
-                section(s -> s.text(markdownText(":one: Ok, now you can run /canvas-authenticate <token> (put your canvas token after the slash command)"))),
+                section(s -> s.text(markdownText(":one: Ok, now you can run /authenticate-canvas <token> (put your canvas token after the slash command)"))),
                 section(s -> s.text(markdownText(":two: That's all it takes! You're officially connected to Canvas now. Below are a few commands you can get started with."))),
 
                 divider(),

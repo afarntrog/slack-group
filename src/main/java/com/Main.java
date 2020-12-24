@@ -62,14 +62,13 @@ public class Main {
     }
 
     public static void saveUserInformation(String userId, String canvasAccessToken, SlashCommandContext ctx) {
-        String response = "s";
+        String response;
         Connection conn = establishConnection();
 
         // query inserts new users into DB and updates existing users' tokens
         String query = "INSERT INTO users " +
                         "VALUES(?,?) ON CONFLICT (userid) DO " +
                         "UPDATE SET canvasaccesstoken = ?";
-
         try {
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, userId);
@@ -77,13 +76,11 @@ public class Main {
             stmt.setString(3, canvasAccessToken);
 
             stmt.executeUpdate();
-            response = ":heavy_check_mark: We have successfully saved your token!";
-        } catch(SQLException e) {
-            e.printStackTrace();
-            response = "hmm.. we're having trouble saving your token. " +
-                    "\n\nWe'll notify our developers immediately";
+            response = savedTokenSuccessResponse();
+        } catch(SQLException sqlException) {
+            sqlException.printStackTrace();
+            response = errorSavingTokenResponse();
         }
-
         try {
             String finalResponse = response;
             ctx.respond(asBlocks(section(s -> s.text(markdownText(finalResponse)))));
@@ -104,8 +101,8 @@ public class Main {
 
             rs.next();
             return rs.getString(2); // canvas authentication token
-        } catch(SQLException e) {
-            e.printStackTrace();
+        } catch(SQLException sqlEx) {
+            sqlEx.printStackTrace();
         }
 
         return "";
@@ -114,6 +111,21 @@ public class Main {
     public static CanvasGetter setupCanvasGetter(String userId) {
         String canvasAuthToken = getCanvasTokenFromUserId(userId);
         return new CanvasGetter(canvasAuthToken);
+    }
+
+    public static String savedTokenSuccessResponse() {
+        return "*We have successfully saved your token!* :heavy_check_mark: " +
+                ":closed_lock_with_key:";
+    }
+
+    private static String errorSavingTokenResponse() {
+        return "hmm.. we're having trouble saving your token. " +
+                "\n\nWe'll notify our developers immediately";
+    }
+
+    private static String invalidTokenResponse() {
+        return ":octagonal_sign: *We couldn't access " +
+                "your Canvas account.*" + "\n\nYour token may have expired.";
     }
 
     public static void main(String[] args) throws Exception {
@@ -135,11 +147,13 @@ public class Main {
 
                 section(s -> s.text(markdownText("/*helloworld* - To get this message again"))),
                 section(s -> s.text(markdownText("/*authenticate-canvas* - To connect to Canvas (you only have to do it once!)"))),
-                section(s -> s.text(markdownText("/*upcoming-assignments* - get all upcoming assignments")))
+                section(s -> s.text(markdownText("/*upcoming-assignments* - get all upcoming assignments"))),
+                section(s -> s.text(markdownText("/*course-list* - get a list of courses that have assignments"))),
+                section(s -> s.text(markdownText("/*course-assignments* - get upcoming assignments for this course")))
             ));
         });
 
-        app.command("/course-assignment-list", (req, ctx) -> {
+        app.command("/course-list", (req, ctx) -> {
 
             // Returns a numbered list that contains the Courses.
             new Thread(() -> {
@@ -165,7 +179,7 @@ public class Main {
         });
 
 
-        app.command("/get-me-ass", (req, ctx) -> {
+        app.command("/course-assignments", (req, ctx) -> {
             int courseNumber = Integer.parseInt(req.getPayload().getText());
 
             // Returns a numbered list that contains the Courses.
@@ -209,10 +223,9 @@ public class Main {
                     CanvasGetter canvasGetter = setupCanvasGetter(req.getPayload().getUserId());
                     String upcomingAssignments = canvasGetter.getUpcomingAssignments();
                     ctx.respond(asBlocks(
-                            section(s -> s.text(markdownText(":clipboard: *Here are your upcoming assignments:*"))),
-
+                            section(s -> s.text(markdownText(
+                                    ":clipboard: *Here are your upcoming assignments:*"))),
                             divider(),
-
                             section(s -> s.text(markdownText(upcomingAssignments)))
                     ));
                 } catch (Exception e) {
@@ -220,9 +233,7 @@ public class Main {
                     try {
                         ctx.respond(asBlocks(
                                 divider(),
-                                section(s -> s.text(markdownText(":no_entry_sign: We couldn't get " +
-                                                "in to your Canvas account. :no_entry_sign:" +
-                                                "\n\nYour token may have expired.")))
+                                section(s -> s.text(markdownText(invalidTokenResponse())))
                         ));
                     } catch (Exception ee) {
                         ee.printStackTrace();
@@ -239,4 +250,6 @@ public class Main {
         SlackAppServer server = new SlackAppServer(app, port);
         server.start();
     }
+
+
 }

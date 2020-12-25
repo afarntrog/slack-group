@@ -170,13 +170,20 @@ public class Main {
                     ));
                 } catch (Exception e) {
                     e.printStackTrace();
+                    try {
+                        ctx.respond(asBlocks(
+                                divider(),
+                                section(s -> s.text(markdownText(invalidTokenResponse())))
+                        ));
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
                 }
             }).start();
 
             System.out.println("THREAD+++++++ " + Thread.activeCount());
             return ctx.ack("We're getting all your courses that have assignments ...");
         });
-
 
         app.command("/course-assignments", (req, ctx) -> {
             int courseNumber = Integer.parseInt(req.getPayload().getText());
@@ -195,14 +202,20 @@ public class Main {
                     ));
                 } catch (Exception e) {
                     e.printStackTrace();
+                    try {
+                        ctx.respond(asBlocks(
+                                divider(),
+                                section(s -> s.text(markdownText(invalidTokenResponse())))
+                        ));
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
                 }
             }).start();
 
             System.out.println("THREAD+++++++ " + Thread.activeCount());
             return ctx.ack("We're getting your upcoming assignments for course number " + courseNumber + "...");
         });
-
-
 
         app.command("/authenticate-canvas", (req, ctx) -> {
             String userId = req.getPayload().getUserId();
@@ -244,11 +257,8 @@ public class Main {
             return ctx.ack("We're getting the info now...");
         });
 
-
         int port = Integer.parseInt(environment.get("PORT"));
         SlackAppServer server = new SlackAppServer(app, port);
         server.start();
     }
-
-
 }

@@ -23,6 +23,7 @@ import edu.ksu.canvas.requestOptions.ListCourseAssignmentsOptions;
 import edu.ksu.canvas.requestOptions.ListCurrentUserCoursesOptions;
 import java.lang.ClassNotFoundException;
 
+import org.mortbay.util.IO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -198,7 +199,7 @@ public class Main {
             }).start();
 
             System.out.println("THREAD+++++++ " + Thread.activeCount());
-            return ctx.ack("We're getting your upcoming assignments for chose number " + courseNumber + "...");
+            return ctx.ack("We're getting your upcoming assignments for course number " + courseNumber + "...");
         });
 
 
@@ -233,8 +234,8 @@ public class Main {
                                 divider(),
                                 section(s -> s.text(markdownText(invalidTokenResponse())))
                         ));
-                    } catch (Exception ee) {
-                        ee.printStackTrace();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
                     }
                 }
             }).start();

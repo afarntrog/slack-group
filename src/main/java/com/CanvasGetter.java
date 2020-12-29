@@ -118,6 +118,7 @@ public class CanvasGetter {
         
         for(Course course : myCourses) {
             LOG.info("  " + course.getName());
+            if (course == null) continue;
 
             assignments = getAssignments(course);
             int i = 1;

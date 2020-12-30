@@ -165,7 +165,7 @@ public class CanvasGetter {
         List<Course> myCourses = getCourses();
         List<Course> courseResults = new ArrayList<>();
         for(Course course : myCourses) {
-            if (course == null) continue;
+            if (course.getName() == null || course == null) continue;
             if (courseHasAssignments(course))
                 courseResults.add(course);
         }
@@ -173,7 +173,7 @@ public class CanvasGetter {
     }
 
     private boolean courseHasAssignments(Course course) throws IOException {
-        if (course == null) return false;
+        if (course.getName() == null || course == null) return false;
         for (Assignment as : getAssignments(course)) {
             Date date = as.getDueAt();
             if (date != null) {
@@ -195,7 +195,7 @@ public class CanvasGetter {
         try {
             StringBuilder stringBuilder = new StringBuilder();
             Course course = getCourse(courseNumber);
-            if (course != null) {
+            if (course != null && course.getName() != null) {
                 List<Assignment> assignments = getAssignments(course);
                 if (assignments == null || assignments.size() <1) return "There are no assignments";
                 int i = 1;
